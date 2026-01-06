@@ -1,0 +1,22 @@
+global:
+  resolve_timeout: 5m
+
+route:
+  group_by: ["alertname", "namespace"]
+  group_wait: 30s
+  group_interval: 5m
+  repeat_interval: 4h
+  receiver: default
+
+  routes:
+  - matchers:
+    - name: env
+      value: octofriends-uat
+    receiver: teams-octofriends-uat
+
+receivers:
+- name: default
+
+- name: teams-octofriends-uat
+  webhook_configs:
+  - url: http://prometheus-msteams.openshift-monitoring:2000/alertmanager
