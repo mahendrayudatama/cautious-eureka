@@ -1,0 +1,32 @@
+apiVersion: monitoring.rhobs.com/v1
+kind: PrometheusRule
+metadata:
+  name: octofriends-uat-pod-alerts
+  namespace: octofriends-uat
+spec:
+  groups:
+  - name: octofriends-uat.pods
+    rules:
+    - alert: OctofriendsUATPodNotReady
+      expr: |
+        kube_pod_status_ready{namespace="octofriends-uat",condition="true"} == 0
+      for: 2m
+      labels:
+        severity: critical
+        env: octofriends-uat
+        namespace: octofriends-uat
+      annotations:
+        summary: "Octofriends UAT Pod Not Ready"
+        description: "Pod {{ $labels.pod }} in octofriends-uat is not ready"
+
+    - alert: OctofriendsUATPodCrashLoop
+      expr: |
+        rate(kube_pod_container_status_restarts_total{namespace="octofriends-uat"}[5m]) > 0
+      for: 2m
+      labels:
+        severity: critical
+        env: octofriends-uat
+        namespace: octofriends-uat
+      annotations:
+        summary: "Octofriends UAT Pod CrashLoop"
+        description: "Pod {{ $labels.pod }} in octofriends-uat is restarting"
